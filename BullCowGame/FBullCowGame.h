@@ -29,11 +29,12 @@ public:
 	bool IsGameWon() const;
 
 	void Reset(); // TODO make a more rich return value.
-	FBullCowCount SubmitGuess(FString);
+	FBullCowCount SubmitValidGuess(FString);
 
 private:
 	// see constructor for initialization 
 	int32 MyCurrentTry;
 	int32 MyMaxTries;
 	FString MyHiddenWord;
+	bool bGameWon;
 };

@@ -2,6 +2,13 @@
 
 using int32 = int;
 
+FBullCowGame::FBullCowGame() { Reset(); }
+
+int32 FBullCowGame::GetMaxTries() const { return MyMaxTries; }
+int32 FBullCowGame::GetCurrentTry() const { return MyCurrentTry; }
+int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
+bool FBullCowGame::IsGameWon() const { return bGameWon; }
+
 void FBullCowGame::Reset() {
 	constexpr int32 MAX_TRIES = 8;
 	const FString HIDDEN_WORD = "planet";
@@ -9,22 +16,20 @@ void FBullCowGame::Reset() {
 	MyMaxTries = MAX_TRIES;
 	MyHiddenWord = HIDDEN_WORD;
 	MyCurrentTry = 1;
+	bGameWon = false;
 	return;
 }
 
-FBullCowCount FBullCowGame::SubmitGuess(FString Guess) {
+FBullCowCount FBullCowGame::SubmitValidGuess(FString Guess) {
 	// receives a valid guess, increments turn, and returns count
-
-	// increment the turn counter
 	MyCurrentTry++;
-
-	// setup a return var
 	FBullCowCount BullCowCount;
+	int32 WordLength = MyHiddenWord.length(); // assuming same length as guess
 
-	// loop through all letters in guess
-	int32 MyHiddenWordLength = MyHiddenWord.length();
-	for (int32 i = 0; i < MyHiddenWordLength; i++) {
-		for (int32 j = 0; j < MyHiddenWordLength; j++) {
+	// loop through all letters in hidden word
+	for (int32 i = 0; i < WordLength; i++) {
+		// loop through all letters in guess
+		for (int32 j = 0; j < WordLength; j++) {
 			if (Guess[i] == MyHiddenWord[j]) {
 				if (i == j) {
 					BullCowCount.Bulls++;
@@ -36,22 +41,16 @@ FBullCowCount FBullCowGame::SubmitGuess(FString Guess) {
 		}
 	}
 
+	if (BullCowCount.Bulls == WordLength) {
+		bGameWon = true;
+	} 
+	else {
+		bGameWon = false;
+	}
+
 	return BullCowCount;
 }
 
-FBullCowGame::FBullCowGame() {
-	Reset();
-}
-
-int32 FBullCowGame::GetMaxTries() const { return MyMaxTries; }
-
-int32 FBullCowGame::GetCurrentTry() const { return MyCurrentTry; }
-
-int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
-
-bool FBullCowGame::IsGameWon() const {
-	return false;
-}
 
 EGuessStatus FBullCowGame::CheckGuessValidity(FString Guess) const {
 	if (false) {
