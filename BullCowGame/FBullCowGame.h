@@ -1,6 +1,9 @@
+/* FBullCowGame Header File */
+
 #pragma once
 #include <string>
 
+// To make syntax Unreal Engine friendly
 using FString = std::string;
 using int32 = int;
 
@@ -28,13 +31,12 @@ public:
 	EGuessStatus CheckGuessValidity(FString) const;
 	bool IsGameWon() const;
 
-	void Reset(); // TODO make a more rich return value.
+	void Reset();
 	FBullCowCount SubmitValidGuess(FString);
 
 private:
 	// see constructor for initialization 
 	int32 MyCurrentTry;
-	int32 MyMaxTries;
 	FString MyHiddenWord;
 	bool bGameWon;
 

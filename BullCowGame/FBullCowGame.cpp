@@ -1,29 +1,43 @@
+/* FBullCowGame is a class that contains all game logic.
+Each instance of the class is a new game. Reset() can be called 
+to reset the game. 
+*/
+
+#pragma once
 #include "FBullCowGame.h"
 #include <map>
-#define TMap std::map
 
+// To make syntax Unreal Engine friendly
+#define TMap std::map
 using int32 = int;
 
-FBullCowGame::FBullCowGame() { Reset(); }
+FBullCowGame::FBullCowGame() { Reset(); } // default constructor
 
-int32 FBullCowGame::GetMaxTries() const { return MyMaxTries; }
 int32 FBullCowGame::GetCurrentTry() const { return MyCurrentTry; }
 int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
 bool FBullCowGame::IsGameWon() const { return bGameWon; }
 
-void FBullCowGame::Reset() {
-	constexpr int32 MAX_TRIES = 8;
-	const FString HIDDEN_WORD = "planet";
+int32 FBullCowGame::GetMaxTries() const { 
+	/* Depending on the length of the hidden word, return the amount of maximum tries. */
 
-	MyMaxTries = MAX_TRIES;
+	TMap<int32, int32> WordLengthToMaxTries{ {3,4}, {4, 7}, {5, 10}, {6, 16}, {7, 20} };
+	return WordLengthToMaxTries[MyHiddenWord.length()];
+}
+
+void FBullCowGame::Reset() {
+	/* Reset the game, each time it is run. */
+
+	const FString HIDDEN_WORD = "plane"; // This MUST be an isogram
 	MyHiddenWord = HIDDEN_WORD;
+
 	MyCurrentTry = 1;
 	bGameWon = false;
 	return;
 }
 
 FBullCowCount FBullCowGame::SubmitValidGuess(FString Guess) {
-	// receives a valid guess, increments turn, and returns count
+	/* Using a valid guess, count the amount of Bulls and Cows. Check if game is won or not. */
+
 	MyCurrentTry++;
 	FBullCowCount BullCowCount;
 	int32 WordLength = MyHiddenWord.length(); // assuming same length as guess
@@ -42,7 +56,6 @@ FBullCowCount FBullCowGame::SubmitValidGuess(FString Guess) {
 			}
 		}
 	}
-
 	if (BullCowCount.Bulls == WordLength) {
 		bGameWon = true;
 	} 
@@ -54,6 +67,8 @@ FBullCowCount FBullCowGame::SubmitValidGuess(FString Guess) {
 }
 
 bool FBullCowGame::IsIsogram(FString Word) const {
+	/* Return if Word is an isogram. */
+
 	// treat 0 and 1 letter words as isograms
 	if (Word.length() <= 1) { return true; }
 	
@@ -73,6 +88,8 @@ bool FBullCowGame::IsIsogram(FString Word) const {
 }
 
 bool FBullCowGame::IsLowercase(FString Word) const {
+	/* Return if Word is lowercase. */
+
 	// treat 0 letter words as lowercase
 	if (Word.length() < 1) { return true; }
 
@@ -87,6 +104,8 @@ bool FBullCowGame::IsLowercase(FString Word) const {
 
 
 EGuessStatus FBullCowGame::CheckGuessValidity(FString guess) const {
+	/* Check if guess is valid or not. */
+
 	if (!IsIsogram(guess)) {
 		// if the guess isn't an isogram, return an error,
 		return EGuessStatus::Not_Isogram;

@@ -3,21 +3,26 @@ This acts as the view in a MVC pattern, and is responsible for all
 user interaction. For game logic see the FBullCowGame class.
 */
 
+#pragma once
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cctype>
 #include "FBullCowGame.h"
 
+// To make syntax Unreal Engine friendly
 using FText = std::string;
 using int32 = int;
 
+// function prototypes
+void PrintAsciiArtFromFile();
 void PrintIntro();
 void PlayGame();
 void PrintGameSummary();
 FText GetValidGuess();
 bool AskToPlayAgain();
 
-FBullCowGame BCGame; // instantiate a new game
+FBullCowGame BCGame; // instantiate a new game, which we re-use across plays
 
 int main() {
 	bool bPlayAgain = false;
@@ -27,29 +32,28 @@ int main() {
 		bPlayAgain = AskToPlayAgain();
 	} while (bPlayAgain);
 
-	// end line, end of game
 	std::cout << std::endl;
 	return 0;
 }
 
 void PrintIntro() {
-	// introduce the game
-	std::cout << "\nWelcome to Bulls and Cows, a word game made by Storm as a C++ "
+	std::cout << "\nWelcome to Bulls and Cows: The Game, a word game made by Storm as a C++ "
 		"tutorial/refresher.\n";
+	PrintAsciiArtFromFile();
 	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength() << " letter isogram I'm thinking "
 		"of?\n\n";
 
 	return;
 }
 
-void PlayGame()
-{
+void PlayGame() {
+	/* Plays a single game to completion. */
+
 	BCGame.Reset();
-	int32 MaxTries = BCGame.GetMaxTries();
  
 	// loop asking for guesses while the game is NOT won
 	// and there are still tries remaining.
-	while (!BCGame.IsGameWon() && BCGame.GetCurrentTry() <= MaxTries){
+	while (!BCGame.IsGameWon() && BCGame.GetCurrentTry() <= BCGame.GetMaxTries()){
 		FText guess = GetValidGuess();
 
 		// Submit valid guess to the game
@@ -64,32 +68,33 @@ void PlayGame()
 	return;
 }
 
-// loop continually until the user gives a valid guess
 FText GetValidGuess() {
+	/* loop continually until the user gives a valid guess. */
+
 	FText guess = "";
 	EGuessStatus Status = EGuessStatus::Invalid_Status;
 	do {
 		// get a guess from the player
 		int32 TryNum = BCGame.GetCurrentTry();
-		std::cout << "Try " << TryNum << ". Please enter in your guess: ";
+		std::cout << "Try " << TryNum << " of " << BCGame.GetMaxTries();
+		std::cout << ". Please enter in your guess: ";
 		std::getline(std::cin, guess);
 
 		Status = BCGame.CheckGuessValidity(guess);
 		switch (Status) {
 		case EGuessStatus::Wrong_Length:
-			std::cout << "Please enter a " << BCGame.GetHiddenWordLength() << " letter word. \n";
+			std::cout << "Please enter a " << BCGame.GetHiddenWordLength() << " letter word. \n\n";
 			break;
 		case EGuessStatus::Not_Isogram:
-			std::cout << "Please enter in an isogram. An Isogram has no repeating characters. \n";
+			std::cout << "Please enter in an isogram. An Isogram has no repeating characters. \n\n";
 			break;
 		case EGuessStatus::Not_Lowercase:
-			std::cout << "Please enter in a fully lowercase word. \n";
+			std::cout << "Please enter in a fully lowercase word. \n\n";
 			break;
 		default:
 			// assume the guess is valid.
 			break;
 		}
-		std::cout << std::endl;
 	} while (Status != EGuessStatus::OK);
 	
 	return guess;
@@ -111,4 +116,17 @@ void PrintGameSummary() {
 	else {
 		std::cout << "You lost. Better luck next time." << std::endl;
 	}
+}
+
+void PrintAsciiArtFromFile() {
+	std::string line;
+	std::ifstream ArtFile("art.txt");
+	if (ArtFile.is_open()) {
+		while (getline(ArtFile, line)) {
+			std::cout << line << '\n';
+		}
+		ArtFile.close();
+	}
+
+	else std::cout << "Unable to open file";
 }
