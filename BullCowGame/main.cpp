@@ -13,16 +13,16 @@ using int32 = int;
 
 void PrintIntro();
 void PlayGame();
+void PrintGameSummary();
 FText GetValidGuess();
 bool AskToPlayAgain();
 
 FBullCowGame BCGame; // instantiate a new game
 
 int main() {
-	PrintIntro();
-
 	bool bPlayAgain = false;
 	do {
+		PrintIntro();
 		PlayGame();
 		bPlayAgain = AskToPlayAgain();
 	} while (bPlayAgain);
@@ -34,7 +34,7 @@ int main() {
 
 void PrintIntro() {
 	// introduce the game
-	std::cout << "Welcome to Bulls and Cows, a word game made by storm as a C++ "
+	std::cout << "\nWelcome to Bulls and Cows, a word game made by Storm as a C++ "
 		"tutorial/refresher.\n";
 	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength() << " letter isogram I'm thinking "
 		"of?\n\n";
@@ -59,7 +59,9 @@ void PlayGame()
 		std::cout << " and Cows =  " << BullCowCount.Cows << "\n\n";
 	}
 
-	// TODO summarize game
+	PrintGameSummary();
+
+	return;
 }
 
 // loop continually until the user gives a valid guess
@@ -95,9 +97,18 @@ FText GetValidGuess() {
 }
 
 bool AskToPlayAgain() {
-	std::cout << "Do you want to play again (y/n)? ";
+	std::cout << "Do you want to play again with the same hidden word? (y/n)? ";
 	FText Response = "";
 	std::getline(std::cin, Response);
 	
 	return (tolower(Response[0]) == 'y');
+}
+
+void PrintGameSummary() {
+	if (BCGame.IsGameWon()) {
+		std::cout << "You won! Congratulations." << std::endl;
+	}
+	else {
+		std::cout << "You lost. Better luck next time." << std::endl;
+	}
 }
